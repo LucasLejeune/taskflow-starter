@@ -21,8 +21,6 @@ import {
 let tasks = []
 let currentFilter = 'all'
 
-const unusedVariable = "test";
-
 // Éléments du DOM
 const taskForm = document.getElementById('task-form')
 const taskInput = document.getElementById('task-input')
