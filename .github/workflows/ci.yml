@@ -3,6 +3,10 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -15,10 +19,7 @@ on:
         options:
           - staging
           - production
-      debug:
-        description: 'Enable debug mode'
-        type: boolean
-        default: false
+
 
 
 jobs:
@@ -54,7 +55,7 @@ jobs:
           echo "Building version: ${{ vars.APP_VERSION }}"
           echo "Commit: ${{ github.sha }}"
           echo "Branch: ${{ github.ref_name }}"
-          
+
       - name: Debug info
         if: inputs.debug == true
         run: |
