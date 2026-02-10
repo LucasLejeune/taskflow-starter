@@ -19,6 +19,10 @@ on:
         options:
           - staging
           - production
+      debug:
+        description: 'Enable debug mode'
+        type: boolean
+        default: false
 
 
 
