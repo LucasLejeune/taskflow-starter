@@ -1,64 +1,150 @@
-/**
- * Tests pour le module tasks.js
- *
- * OBJECTIF JOUR 3 : Atteindre une couverture de code >= 70%
- *
- * Tests existants : 2 (exemple)
- * Tests à ajouter : ~5-8 pour atteindre 70%
- */
+import { describe, test, expect, beforeEach } from 'vitest';
 
-import { describe, it, expect } from 'vitest'
-import { createTask, addTask, deleteTask } from '../src/tasks.js'
+// Simuler localStorage pour les tests
+const localStorageMock = {
+  store: {},
+  getItem(key) {
+    return this.store[key] || null;
+  },
+  setItem(key, value) {
+    this.store[key] = value;
+  },
+  clear() {
+    this.store = {};
+  },
+};
 
-describe('createTask', () => {
-  it('devrait créer une tâche avec les propriétés par défaut', () => {
-    const task = createTask('Ma nouvelle tâche')
+global.localStorage = localStorageMock;
 
-    expect(task).toHaveProperty('id')
-    expect(task.text).toBe('Ma nouvelle tâche')
-    expect(task.priority).toBe('medium')
-    expect(task.completed).toBe(false)
-    expect(task).toHaveProperty('createdAt')
-  })
+// Importer après le mock
+import { TaskManager } from '../src/tasks.js';
 
-  it('devrait créer une tâche avec une priorité personnalisée', () => {
-    const task = createTask('Tâche urgente', 'high')
+describe('TaskManager', () => {
+  let manager;
 
-    expect(task.priority).toBe('high')
-  })
+  beforeEach(() => {
+    localStorage.clear();
+    manager = new TaskManager();
+  });
 
-  // TODO Jour 3 : Ajouter des tests pour les cas d'erreur
-  // - texte vide
-  // - texte null/undefined
-  // - priorité invalide
-})
+  describe('Initialization', () => {
+    test('should start with empty tasks', () => {
+      expect(manager.getTasks()).toEqual([]);
+    });
 
-describe('addTask', () => {
-  it('devrait ajouter une tâche à la liste', () => {
-    const tasks = []
-    const newTask = createTask('Test')
+    test('should have a unique instance ID', () => {
+      expect(manager.id).toBeDefined();
+    });
+  });
 
-    const result = addTask(tasks, newTask)
+  describe('addTask', () => {
+    test('should add a task with title', () => {
+      manager.addTask('Buy milk');
+      const tasks = manager.getTasks();
+      expect(tasks).toHaveLength(1);
+      expect(tasks[0].title).toBe('Buy milk');
+    });
 
-    expect(result).toHaveLength(1)
-    expect(result[0].text).toBe('Test')
-  })
+    test('should generate unique ID for each task', () => {
+      manager.addTask('Task 1');
+      manager.addTask('Task 2');
+      const tasks = manager.getTasks();
+      expect(tasks[0].id).not.toBe(tasks[1].id);
+    });
 
-  // TODO Jour 3 : Ajouter des tests
-  // - ajouter à une liste non vide
-  // - vérifier l'immutabilité
-})
+    test('should set completed to false by default', () => {
+      manager.addTask('New task');
+      const tasks = manager.getTasks();
+      expect(tasks[0].completed).toBe(false);
+    });
 
-describe('deleteTask', () => {
-  // TODO Jour 3 : Implémenter les tests
-  // - supprimer une tâche existante
-  // - supprimer une tâche inexistante
-  // - vérifier l'immutabilité
-})
+    test('should add createdAt timestamp', () => {
+      const before = Date.now();
+      manager.addTask('Timed task');
+      const after = Date.now();
+      const task = manager.getTasks()[0];
+      expect(task.createdAt).toBeGreaterThanOrEqual(before);
+      expect(task.createdAt).toBeLessThanOrEqual(after);
+    });
+  });
 
-// TODO Jour 3 : Ajouter des tests pour :
-// - toggleTask
-// - filterTasks
-// - clearCompleted
-// - countTasks
-// - sortByPriority
+  describe('removeTask', () => {
+    test('should remove task by ID', () => {
+      manager.addTask('To remove');
+      const taskId = manager.getTasks()[0].id;
+      manager.removeTask(taskId);
+      expect(manager.getTasks()).toHaveLength(0);
+    });
+
+    test('should not affect other tasks', () => {
+      manager.addTask('Keep this');
+      manager.addTask('Remove this');
+      const tasks = manager.getTasks();
+      const keepId = tasks[0].id;
+      const removeId = tasks[1].id;
+
+      manager.removeTask(removeId);
+
+      expect(manager.getTasks()).toHaveLength(1);
+      expect(manager.getTasks()[0].id).toBe(keepId);
+    });
+  });
+
+  describe('toggleTask', () => {
+    test('should toggle completed status', () => {
+      manager.addTask('Toggle me');
+      const taskId = manager.getTasks()[0].id;
+
+      manager.toggleTask(taskId);
+      expect(manager.getTasks()[0].completed).toBe(true);
+
+      manager.toggleTask(taskId);
+      expect(manager.getTasks()[0].completed).toBe(false);
+    });
+  });
+
+  describe('getStats', () => {
+    test('should return correct stats', () => {
+      manager.addTask('Task 1');
+      manager.addTask('Task 2');
+      manager.addTask('Task 3');
+
+      const taskId = manager.getTasks()[0].id;
+      manager.toggleTask(taskId);
+
+      const stats = manager.getStats();
+      expect(stats.total).toBe(3);
+      expect(stats.completed).toBe(1);
+      expect(stats.pending).toBe(2);
+    });
+
+    test('should return zeros for empty list', () => {
+      const stats = manager.getStats();
+      expect(stats.total).toBe(0);
+      expect(stats.completed).toBe(0);
+      expect(stats.pending).toBe(0);
+    });
+  });
+
+  describe('Persistence', () => {
+    test('should save tasks to localStorage', () => {
+      manager.addTask('Persistent task');
+      const stored = JSON.parse(localStorage.getItem('taskflow-tasks'));
+      expect(stored).toHaveLength(1);
+      expect(stored[0].title).toBe('Persistent task');
+    });
+
+    test('should load tasks from localStorage on init', () => {
+      // Préparer des données
+      const existingTasks = [
+        { id: '1', title: 'Existing', completed: false, createdAt: Date.now() }
+      ];
+      localStorage.setItem('taskflow-tasks', JSON.stringify(existingTasks));
+
+      // Nouveau manager doit charger les données
+      const newManager = new TaskManager();
+      expect(newManager.getTasks()).toHaveLength(1);
+      expect(newManager.getTasks()[0].title).toBe('Existing');
+    });
+  });
+});
