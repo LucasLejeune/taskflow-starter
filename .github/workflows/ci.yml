@@ -6,25 +6,9 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
-      - '.gitignore'
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Target environment'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - production
-      debug:
-        description: 'Enable debug mode'
-        type: boolean
-        default: false
-
-
 
 jobs:
   lint:
@@ -42,8 +26,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
-  build:
-    name: Build
+  test:
+    name: Test
     runs-on: ubuntu-latest
     needs: lint
     steps:
@@ -53,23 +37,49 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      
-      - name: Show version info
-        run: |
-          echo "Building version: ${{ vars.APP_VERSION }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
+      - name: Run tests with coverage
+        run: npm run test:coverage
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
 
-      - name: Debug info
-        if: inputs.debug == true
-        run: |
-          echo "🐛 Debug mode enabled"
-          echo "Environment: ${{ inputs.environment }}"
-          node --version
-          npm --version
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E tests
+        run: npm run test:e2e
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
 
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test, e2e]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
       - run: npm run build
-      
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -81,15 +91,10 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
-      
-      - name: Deploy info
-        run: |
-          echo "🚀 Would deploy to ${{ inputs.environment || 'production' }}"
-          echo "Files to deploy:"
+      - run: |
+          echo "🚀 Deploying..."
           ls -la dist/
-

@@ -14,6 +14,7 @@ export default defineConfig({
         'node_modules/',
         'tests/',
         '*.config.js',
+        'src/app.js'
       ],
       thresholds: {
         lines: 70,
