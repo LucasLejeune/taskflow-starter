@@ -62,7 +62,6 @@ function handleSubmit(e) {
   e.preventDefault()
 
   const text = taskInput.value.trim()
-  const priority = taskPriority ? taskPriority.value : 'medium'
 
   if (!text) {
     alert('Le texte de la tâche ne peut pas être vide')
