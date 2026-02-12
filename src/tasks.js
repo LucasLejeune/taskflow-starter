@@ -52,4 +52,12 @@ export class TaskManager {
       pending: total - completed,
     }
   }
+
+  filterByStatus(status) {
+    if (status === 'all') return this.getTasks()
+    if (status === 'completed') return this.tasks.filter(t => t.completed)
+    if (status === 'pending') return this.tasks.filter(t => !t.completed)
+    return this.getTasks()
+  }
+
 }
