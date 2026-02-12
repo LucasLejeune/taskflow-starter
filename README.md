@@ -1,6 +1,7 @@
 # TaskFlow
 
 [![CI](https://github.com/LucasLejeune/taskflow-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/LucasLejeune/taskflow-starter/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/LucasLejeune/taskflow-starter)](https://github.com/LucasLejeune/taskflow-starter/releases)
 [![codecov](https://codecov.io/gh/LucasLejeune/taskflow-starter/branch/main/graph/badge.svg)](https://codecov.io/gh/LucasLejeune/taskflow-starter)
 
 
