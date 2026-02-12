@@ -16,7 +16,6 @@ let currentFilter = 'all'
 // Éléments du DOM
 const taskForm = document.getElementById('task-form')
 const taskInput = document.getElementById('task-input')
-const taskPriority = document.getElementById('task-priority')
 const taskList = document.getElementById('task-list')
 const taskCount = document.getElementById('task-count')
 const clearCompletedBtn = document.getElementById('clear-completed')
