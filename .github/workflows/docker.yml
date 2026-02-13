@@ -62,13 +62,6 @@ jobs:
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Convert repository name to lowercase
-        id: repo_name
+      - name: Trigger Render Deployment
         run: |
-          echo "repo_lower=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-      
-      - name: Deploy to Render
-        uses: gh-actions-workflows/deploy-docker-render@v1.1
-        with:
-          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ghcr.io/${{ steps.repo_name.outputs.repo_lower }}:main
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
