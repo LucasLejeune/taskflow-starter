@@ -9,7 +9,7 @@
 
 ##  Demo
 **GitHub Pages** : https://LucasLejeune.github.io/taskflow-starter/
-**Render** : https://taskflow-starter.onrender.com
+**Render** : https://taskflow-starter-wt5x.onrender.com/
 ##  Docker
 ```bash
 docker pull ghcr.io/LucasLejeune/taskflow-starter:latest
