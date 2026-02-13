@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 
+const base = process.env.GITHUB_PAGES === 'true' ? '/taskflow-starter/' : '/';
+
 export default defineConfig({
-  base: '/taskflow-starter/',
+  base: base,
   build: {
     outDir: 'dist',
     emptyOutDir: true,
