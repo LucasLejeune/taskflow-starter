@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: './',
+  base: '/taskflow-starter/',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
