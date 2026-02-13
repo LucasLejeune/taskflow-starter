@@ -8,12 +8,12 @@
 > Application de gestion de tâches avec CI/CD complet
 
 ##  Demo
-**GitHub Pages** : https://VOTRE-USER.github.io/taskflow-starter/
+**GitHub Pages** : https://LucasLejeune.github.io/taskflow-starter/
 **Render** : https://taskflow-starter.onrender.com
 ##  Docker
 ```bash
-docker pull ghcr.io/VOTRE-USER/taskflow-starter:latest
-docker run -d -p 8080:80 ghcr.io/VOTRE-USER/taskflow-starter:latest
+docker pull ghcr.io/LucasLejeune/taskflow-starter:latest
+docker run -d -p 8080:80 ghcr.io/LucasLejeune/taskflow-starter:latest
 ```
 
 ## Description
