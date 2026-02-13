@@ -61,5 +61,8 @@ jobs:
         uses: gh-actions-workflows/deploy-docker-render@v1.1
         with:
           deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ghcr.io/${{ github.repository }}:main
+          image-url: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:main
+        env:
+          GITHUB_REPOSITORY_LOWER: ${{ github.repository }}
+
 
