@@ -23,7 +23,7 @@ TaskFlow est une application web de gestion de tâches (todo list) que vous alle
 
 ```bash
 # Cloner le repository (après fork)
-git clone https://github.com/VOTRE-USERNAME/taskflow.git
+git clone https://github.com/LucasLejeune/taskflow.git
 cd taskflow
 
 # Installer les dépendances
